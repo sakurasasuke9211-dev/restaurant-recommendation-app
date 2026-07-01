@@ -3,12 +3,11 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.config import get_cors_origins
 from src.phase2.api.routes import router
+from src.phase2.middleware.dynamic_cors import DynamicCORSMiddleware
 from src.phase2.middleware.request_id import RequestIDMiddleware
 
 logger = logging.getLogger(__name__)
@@ -20,14 +19,7 @@ APP_VERSION = "0.2.0"
 
 def configure_app(application: FastAPI) -> FastAPI:
     application.add_middleware(RequestIDMiddleware)
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=get_cors_origins(),
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["X-Request-ID"],
-    )
+    application.add_middleware(DynamicCORSMiddleware)
     application.include_router(router)
 
     @application.exception_handler(StarletteHTTPException)
