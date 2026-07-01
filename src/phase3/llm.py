@@ -1,12 +1,12 @@
 import json
 import logging
+import os
 import time
 from typing import Any
 
 from groq import Groq
 
 from src.config import (
-    GROQ_API_KEY,
     LLM_ENABLED,
     LLM_MAX_RETRIES,
     LLM_MAX_TOKENS,
@@ -26,15 +26,19 @@ class LLMResponseError(LLMError):
     pass
 
 
+def _groq_api_key() -> str | None:
+    return os.getenv("GROQ_API_KEY")
+
+
 def is_llm_available() -> bool:
-    return LLM_ENABLED and bool(GROQ_API_KEY)
+    return LLM_ENABLED and bool(_groq_api_key())
 
 
 def complete(messages: list[dict[str, str]]) -> str:
     if not is_llm_available():
         raise LLMError("Groq LLM is not available. Set GROQ_API_KEY in .env and LLM_ENABLED=true.")
 
-    client = Groq(api_key=GROQ_API_KEY, timeout=LLM_TIMEOUT_SECONDS)
+    client = Groq(api_key=_groq_api_key(), timeout=LLM_TIMEOUT_SECONDS)
     last_error: Exception | None = None
 
     for attempt in range(LLM_MAX_RETRIES + 1):

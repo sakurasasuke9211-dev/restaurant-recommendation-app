@@ -43,17 +43,28 @@ def _flatten_toml_secrets(data: dict[str, Any], prefix: str = "") -> None:
 
 
 def _load_local_secrets_toml() -> None:
-    secrets_path = PROJECT_ROOT / ".streamlit" / "secrets.toml"
-    if not secrets_path.is_file():
+    candidates = (
+        PROJECT_ROOT / ".streamlit" / "secrets.toml",
+        Path.home() / ".streamlit" / "secrets.toml",
+    )
+    for secrets_path in candidates:
+        if not secrets_path.is_file():
+            continue
+        try:
+            import tomllib
+        except ModuleNotFoundError:
+            import tomli as tomllib  # type: ignore[no-redef]
+
+        with secrets_path.open("rb") as secrets_file:
+            _flatten_toml_secrets(tomllib.load(secrets_file))
         return
 
-    try:
-        import tomllib
-    except ModuleNotFoundError:
-        import tomli as tomllib  # type: ignore[no-redef]
 
-    with secrets_path.open("rb") as secrets_file:
-        _flatten_toml_secrets(tomllib.load(secrets_file))
+def _load_process_env() -> None:
+    for key in _SECRET_ENV_KEYS:
+        value = os.environ.get(key)
+        if value:
+            os.environ[key] = value
 
 
 def _load_streamlit_runtime_secrets() -> None:
@@ -72,5 +83,6 @@ def _load_streamlit_runtime_secrets() -> None:
 
 def bootstrap_environment() -> None:
     """Apply Streamlit Cloud / local secrets before importing src.config."""
+    _load_process_env()
     _load_local_secrets_toml()
     _load_streamlit_runtime_secrets()

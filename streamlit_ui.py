@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from src.deploy.env import bootstrap_environment
+
+bootstrap_environment()
+
 import streamlit as st
 
-from src.config import CORS_ORIGINS, DATABASE_URL, LLM_ENABLED, LLM_MODEL, PROJECT_ROOT
+from src.config import CORS_ORIGINS, DATABASE_URL, DEFAULT_DB_PATH, LLM_ENABLED, LLM_MODEL, PROJECT_ROOT
 from src.phase1.database import get_session
 from src.phase1.loader import RestaurantRepository
 from src.phase3.llm import is_llm_available
@@ -28,9 +32,18 @@ except Exception as exc:
     restaurant_count = 0
     db_status = f"error: {exc}"
 
+if not DEFAULT_DB_PATH.is_file():
+    st.error(
+        f"Database file not found at `{DEFAULT_DB_PATH}`. "
+        "Push `data/processed/restaurants.db` to GitHub or wait for first-run ingestion to finish."
+    )
+
 col1.metric("Restaurants", f"{restaurant_count:,}")
 col2.metric("Database", db_status)
 col3.metric("LLM", "available" if is_llm_available() else "offline")
+
+if not is_llm_available():
+    st.warning("Set `GROQ_API_KEY` in Streamlit Cloud → Settings → Secrets, then reboot the app.")
 
 with st.expander("Configuration", expanded=False):
     st.write(f"**Database URL:** `{DATABASE_URL}`")

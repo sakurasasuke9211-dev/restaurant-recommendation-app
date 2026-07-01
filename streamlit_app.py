@@ -14,6 +14,10 @@ from src.deploy.env import bootstrap_environment
 
 bootstrap_environment()
 
+from src.deploy.database import ensure_database
+
+ensure_database()
+
 from fastapi import FastAPI
 from streamlit.web.server.starlette import App as StreamlitApp
 

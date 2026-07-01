@@ -29,14 +29,14 @@ SAMPLE_LLM_JSON = json.dumps(
 
 
 class TestLLMAvailability:
-    @patch("src.phase3.llm.GROQ_API_KEY", "")
     @patch("src.phase3.llm.LLM_ENABLED", True)
-    def test_unavailable_without_key(self):
+    @patch("src.phase3.llm._groq_api_key", return_value=None)
+    def test_unavailable_without_key(self, _mock_key):
         assert is_llm_available() is False
 
-    @patch("src.phase3.llm.GROQ_API_KEY", "")
     @patch("src.phase3.llm.LLM_ENABLED", False)
-    def test_complete_raises_without_key(self):
+    @patch("src.phase3.llm._groq_api_key", return_value=None)
+    def test_complete_raises_without_key(self, _mock_key):
         with pytest.raises(LLMError):
             complete([{"role": "user", "content": "test"}])
 
@@ -71,8 +71,8 @@ class TestValidateLLMRecommendations:
 class TestGroqCompleteMocked:
     @patch("src.phase3.llm.Groq")
     @patch("src.phase3.llm.is_llm_available", return_value=True)
-    @patch("src.phase3.llm.GROQ_API_KEY", "test-key")
-    def test_complete_returns_content(self, _available, mock_groq_cls):
+    @patch("src.phase3.llm._groq_api_key", return_value="test-key")
+    def test_complete_returns_content(self, _key, _available, mock_groq_cls):
         mock_client = MagicMock()
         mock_groq_cls.return_value = mock_client
         mock_client.chat.completions.create.return_value = MagicMock(
