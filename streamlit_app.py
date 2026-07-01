@@ -3,7 +3,7 @@
 Run locally:
     streamlit run streamlit_app.py
 
-This serves the FastAPI REST API at /api/v1/* and a Streamlit status dashboard at /.
+Streamlit UI is served at /. REST API routes are mounted at /api/v1/* via st.App routes.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from src.deploy.env import bootstrap_environment
 bootstrap_environment()
 
 from fastapi import FastAPI
+from starlette.routing import Mount
 from streamlit.web.server.starlette import App as StreamlitApp
 
 from src.phase2.app_factory import APP_DESCRIPTION, APP_TITLE, APP_VERSION, configure_app
@@ -32,14 +33,18 @@ async def _streamlit_startup(_st_app):
     yield
 
 
-st_dashboard = StreamlitApp(_UI_SCRIPT, lifespan=_streamlit_startup)
+def _create_mounted_api() -> FastAPI:
+    """API sub-app mounted at /api → public paths like /api/v1/health."""
+    api_app = FastAPI(
+        title=APP_TITLE,
+        description=APP_DESCRIPTION,
+        version=APP_VERSION,
+    )
+    return configure_app(api_app, api_prefix="")
 
-app = FastAPI(
-    title=APP_TITLE,
-    description=APP_DESCRIPTION,
-    version=APP_VERSION,
-    lifespan=st_dashboard.lifespan(),
+
+app = StreamlitApp(
+    _UI_SCRIPT,
+    lifespan=_streamlit_startup,
+    routes=[Mount("/api", app=_create_mounted_api())],
 )
-
-configure_app(app)
-app.mount("/", st_dashboard)

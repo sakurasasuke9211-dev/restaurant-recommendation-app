@@ -16,7 +16,7 @@ from src.phase1.loader import RestaurantRepository
 from src.phase2.services.orchestrator import run_recommendation
 from src.phase3.llm import is_llm_available
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/v1")
 
 
 @router.get("/health", response_model=HealthResponse)

@@ -17,10 +17,10 @@ APP_DESCRIPTION = "AI-powered restaurant recommendation service inspired by Zoma
 APP_VERSION = "0.2.0"
 
 
-def configure_app(application: FastAPI) -> FastAPI:
+def configure_app(application: FastAPI, *, api_prefix: str = "/api") -> FastAPI:
     application.add_middleware(RequestIDMiddleware)
     application.add_middleware(DynamicCORSMiddleware)
-    application.include_router(router)
+    application.include_router(router, prefix=api_prefix)
 
     @application.exception_handler(StarletteHTTPException)
     async def http_exception_handler(
