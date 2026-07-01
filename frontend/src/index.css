@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen bg-zomato-cream font-sans text-zomato-dark antialiased;
+  }
+}
+
+@layer components {
+  .field-label {
+    @apply mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zomato-muted;
+  }
+
+  .field-input {
+    @apply w-full rounded-lg border-0 bg-transparent px-0 py-0 text-sm font-medium text-zomato-dark outline-none disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .filter-cell {
+    @apply rounded-xl border border-gray-100 bg-gray-50/80 px-4 py-3 transition focus-within:border-zomato-red/30 focus-within:ring-2 focus-within:ring-zomato-red/10;
+  }
+
+  .gradient-craving {
+    @apply bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent;
+  }
+}

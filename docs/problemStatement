@@ -1,0 +1,37 @@
+Problem Statement: AI-Powered Restaurant Recommendations System (Zomato Use Case)
+You are tasked with building an AI- powered restaurant recommendation service inspired by Zomato. The system could intelligently suggest restaurant based on their user preferences by combining structured data with an Large language Model (LLM).
+Objective:
+Design and implement an application that:
+•	Takes user preferences (such as location, budget, cuisine and ratings)
+•	Uses a real-world dataset of restaurants
+•	Leverages an LLM getting personalised, human-like recommendations
+•	Displays clear and useful results to the user
+SYSTEM WORKFLOWS
+1.	Data Ingestion
+o	Load and preprocess the dataset of Zomato from hugging face:
+https://huggingface.co/datasets/ManikaSaini/zomato-restaurant-recommendation
+
+o	Extract relevant fields such as restaurant name, location, cuisine, cost, rating etc.
+2.	User Input
+o	Collect user preferences:
+	Location (e.g. Delhi, Bangalore)
+	Budget (low, medium, high)
+	Cuisine (Italian, Chinese)
+	Minimum Rating
+	Any additional preference (e.g. family friendly, quick service)
+3.	Integration Layer
+o	Filter and prepare relevant restaurant data based on user input
+o	Pass structured results into an LLM prompt
+o	Design a prompt that helps the LLM reason and rank options
+4.	Recommendation Engine
+o	Use the LLM to:
+	Rank restaurants
+	Provide explanations (why each recommendation fits)
+	Optionally summarize choices
+5.	Output Display
+o	Present top recommendations in a user-friendly format:
+	Restaurant Name
+	Cuisine
+	Rating
+	Estimated Cost
+	AI-generated explanation
