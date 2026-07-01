@@ -17,9 +17,9 @@ from streamlit.web.server.starlette import App as StreamlitApp
 from src.phase2.app_factory import APP_DESCRIPTION, APP_TITLE, APP_VERSION, configure_app
 
 _UI_SCRIPT = str(Path(__file__).resolve().parent / "streamlit_ui.py")
-st_dashboard = StreamlitApp(_UI_SCRIPT)
 
 _app_configured = False
+_fastapi_app: FastAPI | None = None
 
 
 def _configure_once(application: FastAPI) -> None:
@@ -31,20 +31,24 @@ def _configure_once(application: FastAPI) -> None:
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI):
-    async with st_dashboard.lifespan(application):
-        from src.deploy.runtime import initialize_runtime
+async def _streamlit_startup(_st_app):
+    """Runs after Streamlit loads secrets and prepares the runtime environment."""
+    from src.deploy.runtime import initialize_runtime
 
-        initialize_runtime()
-        _configure_once(application)
-        yield
+    initialize_runtime()
+    if _fastapi_app is not None:
+        _configure_once(_fastapi_app)
+    yield
 
+
+st_dashboard = StreamlitApp(_UI_SCRIPT, lifespan=_streamlit_startup)
 
 app = FastAPI(
     title=APP_TITLE,
     description=APP_DESCRIPTION,
     version=APP_VERSION,
-    lifespan=lifespan,
+    lifespan=st_dashboard.lifespan(),
 )
 
+_fastapi_app = app
 app.mount("/", st_dashboard)
