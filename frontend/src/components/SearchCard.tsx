@@ -56,6 +56,9 @@ export default function SearchCard({ onSubmit, loading }: Props) {
   const [areas, setAreas] = useState<string[]>(["All Bangalore"]);
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [metaLoading, setMetaLoading] = useState(true);
+  const [areasLoading, setAreasLoading] = useState(true);
+  const [cuisinesLoading, setCuisinesLoading] = useState(true);
+  const [metaError, setMetaError] = useState<string | null>(null);
   const [budgetInput, setBudgetInput] = useState(String(DEFAULT_BUDGET));
   const [budgetError, setBudgetError] = useState<string | null>(null);
   const [form, setForm] = useState<PreferenceFormData>({
@@ -74,37 +77,62 @@ export default function SearchCard({ onSubmit, loading }: Props) {
         setCity(selected);
         setForm((prev) => ({ ...prev, location: selected }));
       })
-      .catch(() => {
+      .catch((err) => {
         setCity("Bangalore");
         setForm((prev) => ({ ...prev, location: "Bangalore" }));
+        setMetaError(
+          err instanceof Error
+            ? err.message
+            : "Could not load cities from the backend."
+        );
       })
       .finally(() => setMetaLoading(false));
   }, []);
 
   useEffect(() => {
     if (!city) return;
+    setAreasLoading(true);
     fetchAreas(city)
       .then((list) => {
+        setMetaError(null);
         setAreas(list.length > 0 ? list : ["All Bangalore"]);
         setForm((prev) => ({
           ...prev,
           area: list.includes(prev.area) ? prev.area : list[0] ?? "All Bangalore",
         }));
       })
-      .catch(() => setAreas(["All Bangalore"]));
+      .catch((err) => {
+        setAreas(["All Bangalore"]);
+        setMetaError(
+          err instanceof Error
+            ? err.message
+            : "Could not load Bangalore areas from the backend."
+        );
+      })
+      .finally(() => setAreasLoading(false));
   }, [city]);
 
   useEffect(() => {
     if (!city) return;
+    setCuisinesLoading(true);
     fetchCuisines(city)
       .then((list) => {
+        setMetaError(null);
         setCuisines(list);
         setForm((prev) => ({
           ...prev,
           cuisine: list.includes(prev.cuisine) ? prev.cuisine : list[0] ?? "",
         }));
       })
-      .catch(() => setCuisines([]));
+      .catch((err) => {
+        setCuisines([]);
+        setMetaError(
+          err instanceof Error
+            ? err.message
+            : "Could not load cuisines from the backend."
+        );
+      })
+      .finally(() => setCuisinesLoading(false));
   }, [city]);
 
   const parseBudget = (raw: string): number | null => {
@@ -153,6 +181,13 @@ export default function SearchCard({ onSubmit, loading }: Props) {
       onSubmit={handleSubmit}
       className="rounded-2xl bg-white p-5 text-left shadow-search sm:p-6"
     >
+      {metaError && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">Backend connection issue</p>
+          <p className="mt-1">{metaError}</p>
+        </div>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <label className="filter-cell">
           <span className="field-label">
@@ -161,7 +196,7 @@ export default function SearchCard({ onSubmit, loading }: Props) {
           <select
             className="field-input"
             value={form.area}
-            disabled={metaLoading || loading || areas.length === 0}
+            disabled={metaLoading || areasLoading || loading || areas.length === 0}
             onChange={(e) => setForm((prev) => ({ ...prev, area: e.target.value }))}
           >
             {areas.map((area) => (
@@ -205,11 +240,13 @@ export default function SearchCard({ onSubmit, loading }: Props) {
           <select
             className="field-input"
             value={form.cuisine}
-            disabled={loading || cuisines.length === 0}
+            disabled={loading || cuisinesLoading || cuisines.length === 0}
             onChange={(e) => setForm((prev) => ({ ...prev, cuisine: e.target.value }))}
           >
-            {cuisines.length === 0 ? (
+            {cuisinesLoading ? (
               <option value="">Loading…</option>
+            ) : cuisines.length === 0 ? (
+              <option value="">No cuisines available</option>
             ) : (
               cuisines.map((c) => (
                 <option key={c} value={c}>

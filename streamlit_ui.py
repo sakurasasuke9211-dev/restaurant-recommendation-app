@@ -69,3 +69,9 @@ st.info(
     "Point the Vercel frontend `VITE_API_URL` at this app's public URL "
     "(no trailing slash). Example: `https://your-app.streamlit.app`"
 )
+
+st.warning(
+    "For Vercel (or any external frontend) to call this API, set Sharing to "
+    "**Anyone with the link can view** in Streamlit Cloud app settings, and add "
+    "your Vercel URL to `CORS_ORIGINS` in secrets."
+)
