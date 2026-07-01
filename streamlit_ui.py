@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from src.deploy.env import bootstrap_environment
+from src.deploy.runtime import initialize_runtime
 
-bootstrap_environment()
+initialize_runtime()
 
 import streamlit as st
 
-from src.config import CORS_ORIGINS, DATABASE_URL, DEFAULT_DB_PATH, LLM_ENABLED, LLM_MODEL, PROJECT_ROOT
+from src.config import DATABASE_URL, DEFAULT_DB_PATH, LLM_ENABLED, LLM_MODEL, PROJECT_ROOT, get_cors_origins
 from src.phase1.database import get_session
 from src.phase1.loader import RestaurantRepository
 from src.phase3.llm import is_llm_available
@@ -49,7 +49,7 @@ with st.expander("Configuration", expanded=False):
     st.write(f"**Database URL:** `{DATABASE_URL}`")
     st.write(f"**LLM enabled:** `{LLM_ENABLED}`")
     st.write(f"**LLM model:** `{LLM_MODEL}`")
-    st.write(f"**CORS origins:** `{', '.join(CORS_ORIGINS)}`")
+    st.write(f"**CORS origins:** `{', '.join(get_cors_origins())}`")
     st.write(f"**Project root:** `{PROJECT_ROOT}`")
 
 st.subheader("REST API")

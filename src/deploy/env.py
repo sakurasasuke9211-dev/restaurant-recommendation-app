@@ -28,9 +28,9 @@ def _set_env(key: str, value: Any) -> None:
     if value is None:
         return
     if isinstance(value, bool):
-        os.environ.setdefault(key, "true" if value else "false")
+        os.environ[key] = "true" if value else "false"
     else:
-        os.environ.setdefault(key, str(value))
+        os.environ[key] = str(value)
 
 
 def _flatten_toml_secrets(data: dict[str, Any], prefix: str = "") -> None:

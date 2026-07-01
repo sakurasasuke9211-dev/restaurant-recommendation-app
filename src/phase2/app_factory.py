@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.config import CORS_ORIGINS
+from src.config import get_cors_origins
 from src.phase2.api.routes import router
 from src.phase2.middleware.request_id import RequestIDMiddleware
 
@@ -22,7 +22,7 @@ def configure_app(application: FastAPI) -> FastAPI:
     application.add_middleware(RequestIDMiddleware)
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=CORS_ORIGINS,
+        allow_origins=get_cors_origins(),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

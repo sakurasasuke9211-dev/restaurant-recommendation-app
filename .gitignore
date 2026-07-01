@@ -10,9 +10,8 @@ venv/
 env/
 
 # Database — restaurants.db is committed for Streamlit Cloud (run scripts/ingest.py to regenerate)
-# data/processed/*.db
+data/processed/*.db
 !data/processed/restaurants.db
-
 # Environment
 .env
 .streamlit/secrets.toml
