@@ -4,15 +4,21 @@ import type {
   RecommendationResponse,
 } from "../types";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
 function backendHint(): string {
-  if (!API_BASE) {
-    return "VITE_API_URL is not set. Redeploy the frontend with your Streamlit backend URL.";
-  }
   return (
-    "Check that your Streamlit app is public (Anyone with the link can view) " +
-    "and CORS_ORIGINS includes your Vercel URL."
+    "In Streamlit Cloud open your app → Settings → Sharing → " +
+    '"Anyone with the link can view", then Reboot app. ' +
+    "Also confirm CORS_ORIGINS in Streamlit secrets includes " +
+    "https://restaurant-recommendation-app-seven.vercel.app"
+  );
+}
+
+function privateBackendMessage(): string {
+  return (
+    "The Streamlit backend is blocking anonymous API access (login redirect). " +
+    backendHint()
   );
 }
 
@@ -62,14 +68,28 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${API_BASE}${path}`, {
-    ...init,
-    redirect: "manual",
-    headers: {
-      Accept: "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      redirect: "manual",
+      headers: {
+        Accept: "application/json",
+        ...(init?.headers ?? {}),
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "network error";
+    throw new ApiError(
+      message === "Failed to fetch" ? privateBackendMessage() : `${message}. ${backendHint()}`
+    );
+  }
+
+  if (res.type === "opaqueredirect" || res.status === 0) {
+    throw new ApiError(privateBackendMessage());
+  }
+
+  return res;
 }
 
 export async function fetchCities(): Promise<string[]> {
