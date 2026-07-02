@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 st.title("Restaurant Recommendation API")
-st.caption("FastAPI backend on Streamlit Community Cloud")
+st.caption("Admin dashboard — production API runs on Render; public UI on Vercel")
 
 col1, col2, col3 = st.columns(3)
 
