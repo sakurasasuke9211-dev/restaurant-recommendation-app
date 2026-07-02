@@ -17,7 +17,7 @@ bootstrap_environment()
 
 from fastapi import FastAPI
 from starlette.routing import Mount
-from streamlit.web.server.starlette import App as StreamlitApp
+from streamlit.starlette import App
 
 from src.phase2.app_factory import APP_DESCRIPTION, APP_TITLE, APP_VERSION, configure_app
 
@@ -43,7 +43,7 @@ def _create_mounted_api() -> FastAPI:
     return configure_app(api_app, api_prefix="")
 
 
-app = StreamlitApp(
+app = App(
     _UI_SCRIPT,
     lifespan=_streamlit_startup,
     routes=[Mount("/api", app=_create_mounted_api())],

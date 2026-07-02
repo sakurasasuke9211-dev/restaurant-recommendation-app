@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from src.deploy.runtime import initialize_runtime
-
-initialize_runtime()
-
 import streamlit as st
 
 from src.config import DATABASE_URL, DEFAULT_DB_PATH, LLM_ENABLED, LLM_MODEL, PROJECT_ROOT, get_cors_origins
@@ -35,7 +31,7 @@ except Exception as exc:
 if not DEFAULT_DB_PATH.is_file():
     st.error(
         f"Database file not found at `{DEFAULT_DB_PATH}`. "
-        "Push `data/processed/restaurants.db` to GitHub or wait for first-run ingestion to finish."
+        "Push `data/processed/restaurants.db` to GitHub or run ingestion locally before deploy."
     )
 
 col1.metric("Restaurants", f"{restaurant_count:,}")
@@ -47,6 +43,7 @@ if not is_llm_available():
 
 with st.expander("Configuration", expanded=False):
     st.write(f"**Database URL:** `{DATABASE_URL}`")
+    st.write(f"**Database path:** `{DEFAULT_DB_PATH}`")
     st.write(f"**LLM enabled:** `{LLM_ENABLED}`")
     st.write(f"**LLM model:** `{LLM_MODEL}`")
     st.write(f"**CORS origins:** `{', '.join(get_cors_origins())}`")
@@ -66,8 +63,8 @@ st.markdown(
 )
 
 st.info(
-    "Point the Vercel frontend `VITE_API_URL` at this app's public URL "
-    "(no trailing slash). Example: `https://your-app.streamlit.app`"
+    "The Vercel frontend calls `/api/v1/*` through its proxy to this app "
+    "(same-origin on Vercel, proxied here)."
 )
 
 st.warning(
