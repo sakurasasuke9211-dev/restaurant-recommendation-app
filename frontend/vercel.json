@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://restaurant-recommendation-app-2deployrecommendation.streamlit.app/api/:path*"
+      "destination": "https://restaurant-recommendation-api.onrender.com/api/:path*"
     },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

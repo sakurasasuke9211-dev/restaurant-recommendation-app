@@ -63,8 +63,8 @@ st.markdown(
 )
 
 st.info(
-    "The Vercel frontend calls `/api/v1/*` through its proxy to this app "
-    "(same-origin on Vercel, proxied here)."
+    "Production API: Render (`/api/v1/*` via Vercel proxy). "
+    "This Streamlit page is the admin dashboard only."
 )
 
 st.warning(

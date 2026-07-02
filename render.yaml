@@ -1,5 +1,7 @@
-# Optional: deploy the FastAPI backend on Render when Streamlit Cloud auth blocks API access.
-# After deploy, set VITE_API_URL on Vercel to your Render service URL (or update vercel.json proxy).
+# Optional: deploy the FastAPI backend on Render (recommended for production).
+# 1. Go to https://dashboard.render.com → New → Blueprint → connect this repo.
+# 2. Add GROQ_API_KEY in the Render service environment.
+# 3. Vercel proxies /api/* to this service (see frontend/vercel.json).
 services:
   - type: web
     name: restaurant-recommendation-api
@@ -7,9 +9,10 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn src.phase2.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11.0"
+        value: "3.11.11"
       - key: DATABASE_URL
         value: sqlite:///./data/processed/restaurants.db
       - key: LLM_ENABLED
