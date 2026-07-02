@@ -4,7 +4,11 @@ import type {
   RecommendationResponse,
 } from "../types";
 
-const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+// Production uses same-origin /api/* proxied by Vercel (see frontend/vercel.json).
+// Dev may override with VITE_API_URL; Vercel dashboard env must not force cross-origin calls.
+const API_BASE = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "")
+  : "";
 
 function backendHint(): string {
   return (
