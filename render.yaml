@@ -1,14 +1,15 @@
 # Optional: deploy the FastAPI backend on Render (recommended for production).
-# 1. Go to https://dashboard.render.com → New → Blueprint → connect this repo.
-# 2. Add GROQ_API_KEY in the Render service environment.
-# 3. Vercel proxies /api/* to this service (see frontend/vercel.json).
+# Dashboard → restaurant-recommendation-api → Settings:
+#   Start command: uvicorn render_app:app --host 0.0.0.0 --port $PORT
+#   Build command: pip install -r requirements.txt
+# Environment → add GROQ_API_KEY (secret).
 services:
   - type: web
     name: restaurant-recommendation-api
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.phase2.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn render_app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
       - key: PYTHON_VERSION

@@ -12,16 +12,14 @@ const API_BASE = import.meta.env.DEV
 
 function backendHint(): string {
   return (
-    "In Streamlit Cloud open your app → Settings → Sharing → " +
-    '"Anyone with the link can view", then Reboot app. ' +
-    "Also confirm CORS_ORIGINS in Streamlit secrets includes " +
-    "https://restaurant-recommendation-app-seven.vercel.app"
+    "Confirm Render is running FastAPI (uvicorn render_app:app) and /api/v1/health returns JSON. " +
+    "In Vercel set RENDER_API_URL to your Render service URL if it differs from the default."
   );
 }
 
 function privateBackendMessage(): string {
   return (
-    "The Streamlit backend is blocking anonymous API access (login redirect). " +
+    "The production API backend is unreachable or returned an invalid response. " +
     backendHint()
   );
 }

@@ -23,3 +23,13 @@ application = FastAPI(
     lifespan=lifespan,
 )
 app = configure_app(application)
+
+
+@app.get("/")
+def api_root() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "service": "restaurant-recommendation-api",
+        "health": "/api/v1/health",
+        "docs": "/docs",
+    }
